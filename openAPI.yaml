@@ -1,0 +1,93 @@
+---
+openapi: "3.0.2"
+info:
+  title: OpenPolicyAgent Bundle Proxy
+  description: |-
+    The `OpenPolicyAgent Bundle Proxy` is a proxy between the Open Policy Agent instance and any HTTP server which can provide `json` or `yaml` files.
+    When the bundle endpoint gets queried by OPA, the resource will be downloaded and packaged into a bundle `tar.gz`.
+  version: "1.0"
+externalDocs:
+  description: Open Policy Agent Documentation
+  url: https://www.openpolicyagent.org/docs/latest/
+servers:
+- description: Local endpoint
+  url: http://localhost:8000/
+- description: Docker Host endpoint
+  url: http://host.docker.internal:8000/
+tags:
+- name: Bundles
+  description: Endpoints for downloading bundles
+- name: Monitoring
+  description: Endpoints for monitoring
+
+paths:
+  /healthz:
+    get:
+      summary: Service Health
+      operationId: healthz
+      tags: ["Monitoring"]
+      description: |-
+        This is a simple `healthz` endpoint, which will always return a `200` response if the service is up and running.
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ok
+  /metrics:
+    get:
+      summary: Service Metrics
+      operationId: metrics
+      tags: ["Monitoring"]
+      description: |-
+        Exports metrics of this service in the Prometheus format.
+      externalDocs:
+        description: Prometheus Data Model
+        url: https://prometheus.io/docs/concepts/data_model/
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /v1/bundles/{bundle}.tar.gz:
+    get:
+      summary: Download Bundle
+      operationId: get-bundle
+      tags: ["Bundles"]
+      description: |-
+        Downloads the specified bundle as a `tar.gz`, which contains the `.rego` files and a `.manifest` describing the contens of the file.
+        `Etag`s and caching are supported.
+      externalDocs:
+        description: Open Policy Agent - Bundles
+        url: https://www.openpolicyagent.org/docs/latest/management/#bundles
+      parameters:
+      - in: path
+        name: bundle
+        schema:
+          type: string
+        required: true
+        description: The name of the bundle to get
+      responses:
+        "200":
+          description: OK
+          content:
+            application/gzip: {}
+        "404":
+          description: Not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Not found
+        "500":
+          description: Internal Error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Internal Error: environment variable not defined"

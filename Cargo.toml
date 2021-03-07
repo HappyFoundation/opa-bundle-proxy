@@ -1,0 +1,16 @@
+[package]
+name = "opa-bundle-proxy"
+version = "0.1.0"
+authors = ["Joost Ole Seddig <jst_sddg@outlook.com>"]
+edition = "2018"
+
+[dependencies]
+# Use git dependency until 0.5 will be released
+rocket = "0.4"
+rocket_prometheus = "0.7"
+reqwest = { version = "0.11", features = ["blocking"] }
+flate2 = "1"
+tar = "0.4"
+dotenv = "0.15"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
