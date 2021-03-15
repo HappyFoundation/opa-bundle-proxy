@@ -11,8 +11,8 @@ use serde::{Deserialize, Serialize};
 #[macro_use] extern crate rocket;
 
 // Source: https://stackoverflow.com/a/64904947
-struct CORS;
-impl Fairing for CORS {
+struct Cors;
+impl Fairing for Cors {
     fn info(&self) -> rocket::fairing::Info {
         Info {
             name: "CORS Headers",
@@ -49,7 +49,7 @@ enum BundleResponse {
 }
 
 #[get("/bundles/<bundle>")]
-fn bundle<'r>(bundle: &RawStr) -> BundleResponse {
+fn bundle(bundle: &RawStr) -> BundleResponse {
     if !bundle.ends_with(".tar.gz") {
         return BundleResponse::NotFound("Not found".to_string());
     }
@@ -107,7 +107,7 @@ fn main() {
     let prometheus = PrometheusMetrics::new();
 
     rocket::ignite()
-        .attach(CORS)
+        .attach(Cors)
         .attach(prometheus.clone())
         // Monitoring Endpoints
         .mount("/metrics", prometheus)

@@ -1,0 +1,29 @@
+---
+name: Linting
+on: push
+jobs:
+  rust:
+    name: Rust Linter
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        components: clippy
+        override: true
+    - uses: actions-rs/clippy-check@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        args: --all-features
+  yaml:
+    name: Yaml Linter
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |-
+        python -m pip install --upgrade pip
+        pip install yamllint
+    - name: Lint Yaml Files
+      run: python -m yamllint .
